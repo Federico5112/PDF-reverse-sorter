@@ -62,13 +62,11 @@ def is_apple_command_line_tools_python() -> bool:
 
 def print_mac_tkinter_help() -> None:
     print(
-        "Bu Mac'teki Apple CommandLineTools Python, Tkinter penceresini "
-        "acarken cokebiliyor.\n\n"
+        "Bu Mac'teki Python, Tkinter penceresini acamiyor.\n\n"
         "PDF cevirmeyi terminalden kullanabilirsiniz:\n"
-        "  python3 app.py input.pdf output.pdf\n\n"
-        "Mac'te pencereyi test etmek icin python.org veya Homebrew ile "
-        "guncel Python kurun. Windows icin GitHub Actions'in urettigi exe "
-        "pencereli calisacaktir."
+        "  python3 app.py /dosya/yolu/input.pdf /dosya/yolu/output.pdf\n\n"
+        "Mac'te pencereyi test etmek icin Tkinter destekli Python gerekir. "
+        "Windows icin GitHub Actions'in urettigi exe pencereli calisacaktir."
     )
 
 
@@ -198,7 +196,14 @@ def main(argv: list[str] | None = None) -> int:
         print_mac_tkinter_help()
         return 2
 
-    app = create_gui_app()
+    try:
+        app = create_gui_app()
+    except ModuleNotFoundError as exc:
+        if exc.name == "_tkinter":
+            print_mac_tkinter_help()
+            return 2
+        raise
+
     app.mainloop()
     return 0
 
