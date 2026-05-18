@@ -1,14 +1,16 @@
-const CACHE_NAME = "pdf-reverse-sorter-v1";
+const CACHE_NAME = "pdf-reverse-sorter-v3";
 const APP_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
+  "./styles.css?v=background",
   "./js/app.js",
   "./js/pdf-service.js",
   "./js/ui-state.js",
   "./vendor/pdf-lib.min.js",
   "./manifest.webmanifest",
   "./icon.svg",
+  "./assets/background.png",
 ];
 
 self.addEventListener("install", (event) => {
