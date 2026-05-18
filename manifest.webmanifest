@@ -1,0 +1,18 @@
+{
+  "name": "PDF Sayfa Tersleyici",
+  "short_name": "PDF Ters",
+  "description": "PDF sayfa sirasini tarayici icinde ters ceviren basit arac.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#f6f9fb",
+  "theme_color": "#15766d",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

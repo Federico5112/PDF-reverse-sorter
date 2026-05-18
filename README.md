@@ -9,6 +9,7 @@ Web uygulamasini ac:
 https://federico5112.github.io/PDF-reverse-sorter/
 
 Android, iPhone, Windows ve Mac tarayicilarinda calisir.
+Android'de Chrome menusu uzerinden ana ekrana eklenebilir.
 
 ## Mobil web uygulamasi
 
@@ -27,6 +28,7 @@ Notlar:
 - PDF dosyasi GitHub'a veya baska bir sunucuya yuklenmez.
 - Islem telefonun veya bilgisayarin tarayicisinda yapilir.
 - Cok buyuk PDF dosyalari mobil cihazlarda daha yavas islenebilir.
+- 100 MB ve uzeri PDF'lerde uygulama uyari verir, masaustu surumu daha uygundur.
 
 ## Windows exe
 
@@ -57,4 +59,26 @@ Komut satirindan kullanmak isterseniz:
 
 ```bash
 python3 app.py /dosya/yolu/input.pdf /dosya/yolu/output.pdf
+```
+
+## Gelistirme yapisi
+
+Python masaustu surumu katmanlara ayrildi:
+
+- `pdf_reverse/core.py`: PDF okuma, ters cevirme ve cikti yolu uretme
+- `pdf_reverse/desktop.py`: Tkinter pencere arayuzu
+- `pdf_reverse/cli.py`: komut satiri ve uygulama girisi
+- `tests/test_core.py`: temel PDF ters cevirme testleri
+
+Mobil web surumu de moduler tutulur:
+
+- `js/pdf-service.js`: PDF metadata okuma ve ters cevirme
+- `js/ui-state.js`: ekrandaki durum, hata ve indirme baglantisi
+- `js/app.js`: kullanici olaylari ve PWA kaydi
+- `manifest.webmanifest` ve `service-worker.js`: ana ekrana ekleme ve offline kabuk destegi
+
+Testleri calistirmak icin:
+
+```bash
+python -m unittest discover -s tests
 ```
