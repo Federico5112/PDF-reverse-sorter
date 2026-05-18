@@ -2,6 +2,15 @@
 
 PDF dosyalarindaki sayfa sirasini tersine ceviren basit masaustu uygulamasi.
 
+## Mobil web uygulamasi
+
+Android veya iPhone'da tarayicidan ac:
+
+https://federico5112.github.io/PDF-reverse-sorter/
+
+Sayfa uzerinden PDF secilir, ters cevrilir ve yeni PDF indirilir. Dosya
+tarayici icinde islenir, sunucuya yuklenmez.
+
 ## Mac'te calistirma
 
 ```bash

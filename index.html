@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="PDF sayfa sirasini tarayici icinde ters ceviren basit arac."
+    />
+    <title>PDF Sayfa Tersleyici</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script defer src="vendor/pdf-lib.min.js"></script>
+    <script defer src="web.js"></script>
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="tool-panel" aria-labelledby="app-title">
+        <div class="brand-row">
+          <div class="document-mark" aria-hidden="true">
+            <span></span>
+          </div>
+          <div>
+            <p class="eyebrow">Mobil PDF araci</p>
+            <h1 id="app-title">PDF Sayfa Tersleyici</h1>
+          </div>
+        </div>
+
+        <label class="file-picker" for="pdf-input">
+          <input id="pdf-input" type="file" accept="application/pdf,.pdf" />
+          <span class="picker-title">PDF sec</span>
+          <span class="picker-detail" id="file-detail">
+            Telefonundan veya bilgisayarindan bir PDF dosyasi sec.
+          </span>
+        </label>
+
+        <div class="summary" aria-live="polite">
+          <div>
+            <span class="summary-label">Sayfa</span>
+            <strong id="page-count">-</strong>
+          </div>
+          <div>
+            <span class="summary-label">Durum</span>
+            <strong id="status-text">Hazir</strong>
+          </div>
+        </div>
+
+        <button class="primary-action" id="reverse-button" type="button" disabled>
+          Ters Cevir
+        </button>
+
+        <a class="download-action is-hidden" id="download-link" href="#" download>
+          Ters PDF indir
+        </a>
+
+        <p class="notice" id="notice">
+          Dosya tarayicinda islenir. Sunucuya yuklenmez.
+        </p>
+      </section>
+    </main>
+  </body>
+</html>
