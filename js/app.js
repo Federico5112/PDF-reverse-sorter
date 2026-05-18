@@ -87,7 +87,19 @@ function registerServiceWorker() {
     return;
   }
 
-  navigator.serviceWorker.register("service-worker.js").catch(() => {
+  let refreshing = false;
+
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (refreshing) {
+      return;
+    }
+    refreshing = true;
+    window.location.reload();
+  });
+
+  navigator.serviceWorker.register("service-worker.js").then((registration) => {
+    registration.update();
+  }).catch(() => {
     // PWA destegi basarisiz olursa ana PDF akisi etkilenmez.
   });
 }
