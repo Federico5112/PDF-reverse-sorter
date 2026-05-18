@@ -9,6 +9,11 @@ python3 -m pip install -r requirements.txt
 python3 app.py
 ```
 
+Apple CommandLineTools ile gelen eski Python, bazi macOS surumlerinde Tkinter
+penceresini acarken cokebilir. Bu durumda Mac'te pencereyi test etmek icin
+python.org veya Homebrew ile guncel Python kurun. Windows exe, GitHub Actions'ta
+Windows ortaminda uretildigi icin pencereli calisir.
+
 Komut satirindan kullanmak isterseniz:
 
 ```bash

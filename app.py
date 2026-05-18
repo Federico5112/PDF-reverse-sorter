@@ -3,8 +3,6 @@ from __future__ import annotations
 import argparse
 import sys
 from pathlib import Path
-import tkinter as tk
-from tkinter import filedialog, messagebox
 
 from pypdf import PdfReader, PdfWriter
 
@@ -58,106 +56,128 @@ def reverse_pdf_pages(input_file: str | Path, output_file: str | Path | None = N
     return output_path
 
 
-class PdfReverseApp(tk.Tk):
-    def __init__(self) -> None:
-        super().__init__()
-        self.title(APP_TITLE)
-        self.geometry("520x260")
-        self.minsize(480, 240)
-        self.resizable(False, False)
+def is_apple_command_line_tools_python() -> bool:
+    return sys.platform == "darwin" and "CommandLineTools" in sys.executable
 
-        self.selected_pdf: Path | None = None
-        self.status = tk.StringVar(value="PDF secerek baslayin.")
-        self.file_label = tk.StringVar(value="Henuz dosya secilmedi.")
 
-        self._build_ui()
+def print_mac_tkinter_help() -> None:
+    print(
+        "Bu Mac'teki Apple CommandLineTools Python, Tkinter penceresini "
+        "acarken cokebiliyor.\n\n"
+        "PDF cevirmeyi terminalden kullanabilirsiniz:\n"
+        "  python3 app.py input.pdf output.pdf\n\n"
+        "Mac'te pencereyi test etmek icin python.org veya Homebrew ile "
+        "guncel Python kurun. Windows icin GitHub Actions'in urettigi exe "
+        "pencereli calisacaktir."
+    )
 
-    def _build_ui(self) -> None:
-        wrapper = tk.Frame(self, padx=24, pady=22)
-        wrapper.pack(fill=tk.BOTH, expand=True)
 
-        title = tk.Label(
-            wrapper,
-            text=APP_TITLE,
-            font=("Arial", 20, "bold"),
-            anchor="w",
-        )
-        title.pack(fill=tk.X)
+def create_gui_app():
+    import tkinter as tk
+    from tkinter import filedialog, messagebox
 
-        subtitle = tk.Label(
-            wrapper,
-            text="PDF sayfalarini sondan basa siralar.",
-            font=("Arial", 12),
-            anchor="w",
-        )
-        subtitle.pack(fill=tk.X, pady=(4, 18))
+    class PdfReverseApp(tk.Tk):
+        def __init__(self) -> None:
+            super().__init__()
+            self.title(APP_TITLE)
+            self.geometry("520x260")
+            self.minsize(480, 240)
+            self.resizable(False, False)
 
-        file_box = tk.Label(
-            wrapper,
-            textvariable=self.file_label,
-            anchor="w",
-            relief=tk.GROOVE,
-            padx=10,
-            pady=10,
-        )
-        file_box.pack(fill=tk.X)
+            self.selected_pdf: Path | None = None
+            self.status = tk.StringVar(value="PDF secerek baslayin.")
+            self.file_label = tk.StringVar(value="Henuz dosya secilmedi.")
 
-        buttons = tk.Frame(wrapper)
-        buttons.pack(fill=tk.X, pady=(18, 14))
+            self._build_ui()
 
-        select_button = tk.Button(
-            buttons,
-            text="PDF Sec",
-            width=18,
-            command=self.select_pdf,
-        )
-        select_button.pack(side=tk.LEFT)
+        def _build_ui(self) -> None:
+            wrapper = tk.Frame(self, padx=24, pady=22)
+            wrapper.pack(fill=tk.BOTH, expand=True)
 
-        reverse_button = tk.Button(
-            buttons,
-            text="Sayfalari Ters Cevir",
-            width=24,
-            command=self.reverse_selected_pdf,
-        )
-        reverse_button.pack(side=tk.LEFT, padx=(12, 0))
+            title = tk.Label(
+                wrapper,
+                text=APP_TITLE,
+                font=("Arial", 20, "bold"),
+                anchor="w",
+            )
+            title.pack(fill=tk.X)
 
-        status = tk.Label(
-            wrapper,
-            textvariable=self.status,
-            anchor="w",
-            fg="#255a33",
-        )
-        status.pack(fill=tk.X, pady=(8, 0))
+            subtitle = tk.Label(
+                wrapper,
+                text="PDF sayfalarini sondan basa siralar.",
+                font=("Arial", 12),
+                anchor="w",
+            )
+            subtitle.pack(fill=tk.X, pady=(4, 18))
 
-    def select_pdf(self) -> None:
-        filename = filedialog.askopenfilename(
-            title="PDF sec",
-            filetypes=[("PDF dosyalari", "*.pdf"), ("Tum dosyalar", "*.*")],
-        )
-        if not filename:
-            return
+            file_box = tk.Label(
+                wrapper,
+                textvariable=self.file_label,
+                anchor="w",
+                relief=tk.GROOVE,
+                padx=10,
+                pady=10,
+            )
+            file_box.pack(fill=tk.X)
 
-        self.selected_pdf = Path(filename)
-        self.file_label.set(self.selected_pdf.name)
-        self.status.set("PDF secildi. Ters cevirmek icin butona basin.")
+            buttons = tk.Frame(wrapper)
+            buttons.pack(fill=tk.X, pady=(18, 14))
 
-    def reverse_selected_pdf(self) -> None:
-        if self.selected_pdf is None:
-            messagebox.showwarning(APP_TITLE, "Once bir PDF dosyasi secin.")
-            return
+            select_button = tk.Button(
+                buttons,
+                text="PDF Sec",
+                width=18,
+                command=self.select_pdf,
+            )
+            select_button.pack(side=tk.LEFT)
 
-        try:
-            output_path = reverse_pdf_pages(self.selected_pdf)
-        except Exception as exc:
-            messagebox.showerror(APP_TITLE, str(exc))
-            self.status.set("Islem tamamlanamadi.")
-            return
+            reverse_button = tk.Button(
+                buttons,
+                text="Sayfalari Ters Cevir",
+                width=24,
+                command=self.reverse_selected_pdf,
+            )
+            reverse_button.pack(side=tk.LEFT, padx=(12, 0))
 
-        self.status.set(f"Olusturuldu: {output_path.name}")
-        messagebox.showinfo(
-            APP_TITLE,
-            f"Ters cevrilmis PDF olusturuldu:\n{output_path}",
-        )
+            status = tk.Label(
+                wrapper,
+                textvariable=self.status,
+                anchor="w",
+                fg="#255a33",
+            )
+            status.pack(fill=tk.X, pady=(8, 0))
+
+        def select_pdf(self) -> None:
+            filename = filedialog.askopenfilename(
+                title="PDF sec",
+                filetypes=[("PDF dosyalari", "*.pdf"), ("Tum dosyalar", "*.*")],
+            )
+            if not filename:
+                return
+
+            self.selected_pdf = Path(filename)
+            self.file_label.set(self.selected_pdf.name)
+            self.status.set("PDF secildi. Ters cevirmek icin butona basin.")
+
+        def reverse_selected_pdf(self) -> None:
+            if self.selected_pdf is None:
+                messagebox.showwarning(APP_TITLE, "Once bir PDF dosyasi secin.")
+                return
+
+            try:
+                output_path = reverse_pdf_pages(self.selected_pdf)
+            except Exception as exc:
+                messagebox.showerror(APP_TITLE, str(exc))
+                self.status.set("Islem tamamlanamadi.")
+                return
+
+            self.status.set(f"Olusturuldu: {output_path.name}")
+            messagebox.showinfo(
+                APP_TITLE,
+                f"Ters cevrilmis PDF olusturuldu:\n{output_path}",
+            )
+
+    return PdfReverseApp()
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
@@ -174,7 +194,11 @@ def main(argv: list[str] | None = None) -> int:
         print(f"Olusturuldu: {output_path}")
         return 0
 
-    app = PdfReverseApp()
+    if is_apple_command_line_tools_python():
+        print_mac_tkinter_help()
+        return 2
+
+    app = create_gui_app()
     app.mainloop()
     return 0
 
