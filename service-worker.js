@@ -1,16 +1,18 @@
-const CACHE_NAME = "pdf-reverse-sorter-v4";
+const CACHE_NAME = "dosya-donusturucu-v2";
 const APP_ASSETS = [
   "./",
   "./index.html",
-  "./styles.css",
-  "./styles.css?v=background2",
-  "./js/app.js?v=background2",
-  "./js/pdf-service.js",
-  "./js/ui-state.js",
+  "./styles.css?v=converter3",
+  "./js/app.js?v=converter4",
+  "./js/converter-service.js",
   "./vendor/pdf-lib.min.js",
+  "./vendor/fontkit.umd.min.js",
+  "./vendor/Roboto-Regular.ttf",
+  "./vendor/jszip.min.js",
+  "./vendor/pdf.min.mjs",
+  "./vendor/pdf.worker.min.mjs",
   "./manifest.webmanifest",
   "./icon.svg",
-  "./assets/background.png",
 ];
 
 self.addEventListener("install", (event) => {

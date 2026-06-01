@@ -1,12 +1,12 @@
 {
-  "name": "PDF Sayfa Tersleyici",
-  "short_name": "PDF Ters",
-  "description": "PDF sayfa sirasini tarayici icinde ters ceviren basit arac.",
+  "name": "Dosya Donusturucu",
+  "short_name": "Donusturucu",
+  "description": "PDF, gorsel, metin ve veri dosyalarini tarayicida donusturun. Sunucuya yuklenmez.",
   "start_url": ".",
   "scope": ".",
   "display": "standalone",
-  "background_color": "#f6f9fb",
-  "theme_color": "#15766d",
+  "background_color": "#0b0f1a",
+  "theme_color": "#0b0f1a",
   "icons": [
     {
       "src": "icon.svg",
