@@ -1,84 +1,70 @@
-# PDF Ters Cevirici
+# 🚀 Universal Client-Side File Converter (Dosya Dönüştürücü)
 
-PDF dosyalarindaki sayfa sirasini tersine ceviren basit arac.
+**🔗 Live Demo (Canlı Oyna):** [https://federico5112.github.io/PDF-reverse-sorter/](https://federico5112.github.io/PDF-reverse-sorter/)
 
-## Hemen kullan
+Eskiden sadece bir "PDF Sayfa Ters Çevirici" olan bu proje, artık tarayıcınızın gücünü sonuna kadar kullanan, **%100 gizlilik odaklı, sıfır sunucu maliyetli ve çok yönlü** dev bir Evrensel Dosya Dönüştürücüsüne evrildi!
 
-Web uygulamasini ac:
+---
 
-https://federico5112.github.io/PDF-reverse-sorter/
+## ✨ Neden Bu Araç? (Özellikler)
 
-Android, iPhone, Windows ve Mac tarayicilarinda calisir.
-Android'de Chrome menusu uzerinden ana ekrana eklenebilir.
+Piyasadaki diğer dönüştürücülerin aksine bu sistem dosyalarınızı asla internete, bir sunucuya veya bir bulut servisine **yüklemez.** Bütün dönüştürme işlemleri bilgisayarınızın işlemcisi (CPU) kullanılarak anında **tarayıcınızın içinde** gerçekleşir.
 
-## Mobil web uygulamasi
+*   🔒 **Maksimum Gizlilik:** Belgeleriniz cihazınızdan asla dışarı çıkmaz.
+*   ⚡ **Işık Hızında Dönüşüm:** Dosyaların yüklenmesi ve indirilmesi için beklemeye gerek yoktur.
+*   🌐 **Çevrimdışı Çalışma (PWA):** Sayfayı bir kere yükledikten sonra, internetinizi kapatsanız bile dönüştürücü çalışmaya devam eder!
+*   🛡️ **OOM (Bellek) Koruması:** Devasa görsel ve verilerde tarayıcının çökmesini engelleyen akıllı RAM yönetimi.
+*   🌍 **Sınırsız Dil Desteği:** EPUB ve TXT dönüşümlerinde, Japonca, Arapça, Rusça veya Türkçe fark etmeksizin tüm dilleri kusursuzca destekleyen özel entegre Unicode font motoru (`fontkit` & Roboto).
 
-Sayfa uzerinden PDF secilir, ters cevrilir ve yeni PDF indirilir. Dosya
-tarayici icinde islenir, sunucuya yuklenmez.
+---
 
-Kullanim:
+## 🛠️ Desteklenen Dönüşümler (25+ Format)
 
-1. `PDF sec` butonuna basin.
-2. PDF dosyasini secin.
-3. `Ters Cevir` butonuna basin.
-4. `Ters PDF indir` baglantisindan yeni dosyayi indirin.
+Tek bir modern arayüz üzerinden aşağıdaki tüm dönüşümleri anında yapabilirsiniz:
 
-Notlar:
+### 🔴 PDF Araçları
+*   **PDF Ters Çevir:** PDF sayfalarını baştan sona tersine çevirir.
+*   **PDF → JPG / PNG:** PDF sayfalarını yüksek kaliteli görsellere dönüştürür ve ZIP olarak indirir.
 
-- PDF dosyasi GitHub'a veya baska bir sunucuya yuklenmez.
-- Islem telefonun veya bilgisayarin tarayicisinda yapilir.
-- Cok buyuk PDF dosyalari mobil cihazlarda daha yavas islenebilir.
-- 100 MB ve uzeri PDF'lerde uygulama uyari verir, masaustu surumu daha uygundur.
+### 🟢 Görsel Dönüştürme (Resim)
+*   **JPG / PNG / WebP:** Bu üç format arasında kalite kaybı olmadan sınırsız geçiş yapabilirsiniz.
+*   **GIF / BMP / SVG → JPG / PNG:** Eski veya vektörel formatları yaygın görsel formatlara çevirir.
+*   **Görsel → PDF:** Herhangi bir görseli anında PDF belgesi içine gömer. (Anti-OOM desteğiyle devasa görseller bile anında PDF olur).
 
-## Windows exe
+### 🔵 Belge Dönüştürme
+*   **TXT → PDF:** Düz metinleri profesyonel Helvetica / Roboto fontlarıyla PDF'e döker.
+*   **MD (Markdown) → HTML:** Markdown belgelerini stilize edilmiş modern HTML sayfalarına dönüştürür.
+*   **MD (Markdown) → PDF:** Markdown belgelerini PDF formatına dönüştürür.
 
-GitHub Actions, her push sonrasinda Windows icin pencereli exe olusturur.
+### 🟡 Veri Dönüştürme
+*   **CSV ↔ JSON:** Excel (CSV) verilerini web formatına (JSON) veya tam tersine kayıpsız dönüştürür. (Gelişmiş karakter akış motoru sayesinde satır içi boşluklar ve Enter karakterleri bozulmaz).
 
-Indirmek icin:
+### 🟣 E-Kitap (E-Book)
+*   **EPUB → PDF:** E-kitaplarınızı telefon veya bilgisayarda okuyabilmek için PDF'e dönüştürür.
+*   **EPUB → TXT:** E-kitapların içindeki salt metni tek bir dosya olarak dışa aktarır.
 
-1. GitHub'da `Actions` sekmesini acin.
-2. Son basarili `Build Windows exe` calismasina girin.
-3. `Artifacts` bolumunden `PDF-Ters-Cevirici-Windows` dosyasini indirin.
+---
 
-Release yayinlamak icin indirdiginiz exe dosyasini GitHub Releases'a
-ekleyebilirsiniz.
+## 💻 Teknolojiler
 
-## Mac'te calistirma
+Bu uygulama sıfır Backend felsefesiyle tasarlanmıştır.
 
-```bash
-python3 -m pip install -r requirements.txt
-python3 app.py
-```
+*   **Arayüz:** Vanilla HTML5, Vanilla JS, CSS3 (Modern Glassmorphism & State Machine UI)
+*   **PDF Motoru:** [pdf-lib](https://pdf-lib.js.org/) (Sıfırdan PDF inşası ve sayfa düzenleme)
+*   **Görsel Motoru:** Native HTML5 `<canvas>` API
+*   **Font Motoru:** `@pdf-lib/fontkit` & Google Roboto
+*   **Zipleme:** [JSZip](https://stuk.github.io/jszip/)
+*   **PWA:** Service Workers & Web Manifest
 
-Mac'te pencereyi test etmek icin Tkinter destekli Python gerekir. Homebrew ile
-kurulan bazi Python surumlerinde `_tkinter` ayrica kurulmadigi icin pencere
-acilmayabilir. Windows exe, GitHub Actions'ta Windows ortaminda uretildigi icin
-pencereli calisir.
+---
 
-Komut satirindan kullanmak isterseniz:
+## 🚀 Geliştiriciler İçin (Kurulum)
 
-```bash
-python3 app.py /dosya/yolu/input.pdf /dosya/yolu/output.pdf
-```
+Uygulamayı kendi bilgisayarınızda çalıştırmak isterseniz:
 
-## Gelistirme yapisi
+1. Repoyu klonlayın: `git clone https://github.com/Federico5112/PDF-reverse-sorter.git`
+2. Klonladığınız klasöre girin.
+3. Klasörde herhangi bir basit HTTP sunucusu başlatın (Örn: `python3 -m http.server 8080`)
+4. Tarayıcınızdan `http://localhost:8080` adresine gidin.
 
-Python masaustu surumu katmanlara ayrildi:
-
-- `pdf_reverse/core.py`: PDF okuma, ters cevirme ve cikti yolu uretme
-- `pdf_reverse/desktop.py`: Tkinter pencere arayuzu
-- `pdf_reverse/cli.py`: komut satiri ve uygulama girisi
-- `tests/test_core.py`: temel PDF ters cevirme testleri
-
-Mobil web surumu de moduler tutulur:
-
-- `js/pdf-service.js`: PDF metadata okuma ve ters cevirme
-- `js/ui-state.js`: ekrandaki durum, hata ve indirme baglantisi
-- `js/app.js`: kullanici olaylari ve PWA kaydi
-- `manifest.webmanifest` ve `service-worker.js`: ana ekrana ekleme ve offline kabuk destegi
-
-Testleri calistirmak icin:
-
-```bash
-python -m unittest discover -s tests
-```
+*(Not: Her şey statik olduğu için Node.js veya veritabanı kurmanıza gerek yoktur.)*
