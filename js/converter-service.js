@@ -201,7 +201,21 @@ async function pdfReverse(file, baseName, onProgress) {
   const bytes = await file.arrayBuffer();
   onProgress(30);
 
-  const source = await PDFLib.PDFDocument.load(bytes);
+  let source;
+  try {
+    source = await PDFLib.PDFDocument.load(bytes);
+  } catch (err) {
+    if (err.message && err.message.toLowerCase().includes("encrypted")) {
+      throw new Error("Bu PDF sifreli (parolali) oldugu icin islenemiyor. Lutfen once parolasini kaldirin.");
+    }
+    throw new Error("PDF dosyasi okunamadi veya bozuk.");
+  }
+
+  const pageCount = source.getPageCount();
+  if (pageCount <= 1) {
+    throw new Error("Bu PDF sadece 1 sayfadan olusuyor. Ters cevirilecek bir sayfa sirasi yok.");
+  }
+
   const target = await PDFLib.PDFDocument.create();
   const pageIndexes = source.getPageIndices().reverse();
   onProgress(50);
