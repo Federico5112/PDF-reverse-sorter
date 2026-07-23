@@ -979,11 +979,8 @@ async function pdfSmartRotate(file, baseName, onProgress) {
       }
       
       if (angleToFix !== 0) {
-        // Tesseract'ın verdiği açı saat yönünün tersi (CCW) veya rotasyon ihtiyacı olabilir.
-        // Genelde Tesseract "bu kadar dönmüş" der. Yani düzeltmek için tersini uygulamalıyız.
-        // PDFLib sayfa rotasyonu saat yönündedir.
         const currentRotation = pages[i].getRotation().angle;
-        pages[i].setRotation(PDFLib.degrees(currentRotation + (360 - angleToFix)));
+        pages[i].setRotation(PDFLib.degrees(currentRotation + angleToFix));
       }
       onProgress(60 + Math.round((i / pages.length) * 30)); // 60-90 arası
     }
@@ -1018,7 +1015,7 @@ async function pdfSmartRotate(file, baseName, onProgress) {
       
       if (angleToFix !== 0) {
         const currentRotation = pages[i].getRotation().angle;
-        pages[i].setRotation(PDFLib.degrees(currentRotation + (360 - angleToFix)));
+        pages[i].setRotation(PDFLib.degrees(currentRotation + angleToFix));
       }
       
       onProgress(45 + Math.round((i / pages.length) * 45)); // 45-90 arası
