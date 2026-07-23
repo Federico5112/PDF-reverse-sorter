@@ -960,7 +960,7 @@ async function pdfSmartRotate(file, baseName, onProgress) {
 
   // PDF-lib'i yukle
   onProgress(40);
-  const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+  const pdfDoc = await PDFLib.PDFDocument.load(await file.arrayBuffer());
   const pages = pdfDoc.getPages();
 
   if (usePattern) {
