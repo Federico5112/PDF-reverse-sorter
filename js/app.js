@@ -11,7 +11,7 @@ import {
   getFileCategory,
   getAvailableTools,
   convert,
-} from "./converter-service.js";
+} from "./converter-service.js?v=converter5";
 
 
 // ---- DOM Referansları ----
