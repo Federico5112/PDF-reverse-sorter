@@ -950,9 +950,9 @@ async function pdfSmartRotate(file, baseName, onProgress) {
   if (patternFound) {
     let msg = "";
     if (allSame) {
-      msg = \`Patern Bulundu: Kitaptaki tum sayfalar \${firstAngle} derece yatmis gorunuyor. Tum sayfalara uygulanip aninda duzeltilsin mi?\`;
+      msg = `Patern Bulundu: Kitaptaki tum sayfalar ${firstAngle} derece yatmis gorunuyor. Tum sayfalara uygulanip aninda duzeltilsin mi?`;
     } else {
-      msg = \`Patern Bulundu: Tek sayfalar \${oddAngle} derece, Cift sayfalar \${evenAngle} derece yatmis gorunuyor. Aninda duzeltilsin mi?\`;
+      msg = `Patern Bulundu: Tek sayfalar ${oddAngle} derece, Cift sayfalar ${evenAngle} derece yatmis gorunuyor. Aninda duzeltilsin mi?`;
     }
     
     usePattern = window.confirm(msg);
@@ -1029,6 +1029,6 @@ async function pdfSmartRotate(file, baseName, onProgress) {
 
   return {
     blob: new Blob([pdfBytesOut], { type: "application/pdf" }),
-    fileName: \`\${baseName}_duzeltilmis.pdf\`
+    fileName: `${baseName}_duzeltilmis.pdf`
   };
 }
