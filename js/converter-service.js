@@ -843,8 +843,10 @@ async function loadTesseract(onProgress) {
       document.head.appendChild(script);
     });
     onProgress(10);
-    _tesseractWorker = await window.Tesseract.createWorker('osd', 1, {
-      logger: m => console.log(m)
+    _tesseractWorker = await window.Tesseract.createWorker('osd', 0, {
+      logger: m => console.log(m),
+      legacyCore: true,
+      legacyLang: true
     });
   }
   return _tesseractWorker;
