@@ -1,4 +1,4 @@
-const CACHE_NAME = "dosya-donusturucu-v2";
+const CACHE_NAME = "dosya-donusturucu-v3";
 const APP_ASSETS = [
   "./",
   "./index.html",

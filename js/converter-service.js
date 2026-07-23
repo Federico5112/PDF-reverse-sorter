@@ -42,6 +42,7 @@ export function getAvailableTools(ext) {
         { id: "pdf-reverse", label: "Sayfalari Ters Cevir", emoji: "🔄", targetExt: "pdf" },
         { id: "pdf-to-jpg", label: "PDF → JPG", emoji: "🖼️", targetExt: "jpg" },
         { id: "pdf-to-png", label: "PDF → PNG", emoji: "🖼️", targetExt: "png" },
+        { id: "pdf-smart-rotate", label: "Akilli Yonlendirici", emoji: "🪄", targetExt: "pdf" }
       );
       break;
 
@@ -153,6 +154,8 @@ export async function convert(file, toolId, onProgress = () => {}) {
       return await pdfToImages(file, baseName, "jpg", onProgress);
     case "pdf-to-png":
       return await pdfToImages(file, baseName, "png", onProgress);
+    case "pdf-smart-rotate":
+      return await pdfSmartRotate(file, baseName, onProgress);
 
     // ---- Görsel → Görsel ----
     case "img-to-jpg":
@@ -820,4 +823,212 @@ async function loadPdfJs() {
   _pdfjsLib = mod;
   _pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.mjs";
   return _pdfjsLib;
+}
+
+// ============================================================
+//  TESSERACT VE AKILLI YÖNLENDİRİCİ MANTIĞI
+// ============================================================
+
+let _tesseractWorker = null;
+
+async function loadTesseract(onProgress) {
+  if (!_tesseractWorker) {
+    onProgress(5);
+    await new Promise((resolve, reject) => {
+      if (window.Tesseract) return resolve();
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js";
+      script.onload = resolve;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
+    onProgress(10);
+    _tesseractWorker = await window.Tesseract.createWorker('osd', 1, {
+      logger: m => console.log(m)
+    });
+  }
+  return _tesseractWorker;
+}
+
+async function renderPdfPageToDataUrl(pdf, pageNumber, scale = 1.0) {
+  const page = await pdf.getPage(pageNumber);
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  canvas.width = viewport.width;
+  canvas.height = viewport.height;
+  const ctx = canvas.getContext("2d");
+  await page.render({ canvasContext: ctx, viewport }).promise;
+  return canvas.toDataURL("image/jpeg", 0.8);
+}
+
+async function pdfSmartRotate(file, baseName, onProgress) {
+  onProgress(2);
+  const bytes = await file.arrayBuffer();
+
+  const pdfjsLib = await loadPdfJs();
+  const pdf = await pdfjsLib.getDocument({ data: bytes }).promise;
+  const totalPages = pdf.numPages;
+
+  onProgress(5);
+  // OSD motorunu yukle
+  const worker = await loadTesseract(onProgress);
+
+  // Örnekleme stratejisi:
+  // Eger toplam sayfa 9'dan az ise tüm sayfaları al
+  // Degilse: İlk 6 sayfa + Ortadan 3 rastgele sayfa
+  let pagesToAnalyze = [];
+  if (totalPages <= 9) {
+    for (let i = 1; i <= totalPages; i++) pagesToAnalyze.push(i);
+  } else {
+    pagesToAnalyze = [1, 2, 3, 4, 5, 6];
+    const middleStart = Math.floor(totalPages / 2);
+    pagesToAnalyze.push(middleStart, middleStart + 1, middleStart + 2);
+  }
+
+  onProgress(15);
+  const analysisResults = [];
+
+  // Örnekleri analiz et
+  for (let i = 0; i < pagesToAnalyze.length; i++) {
+    const pageNum = pagesToAnalyze[i];
+    const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum);
+    
+    // Tesseract OSD tespiti
+    const { data } = await worker.recognize(dataUrl, { osd: true });
+    
+    // orientation_degrees genelde 0, 90, 180, 270 döner
+    let angle = data.orientation_degrees || 0;
+    analysisResults.push({ pageNum, angle });
+    
+    onProgress(15 + Math.round(((i + 1) / pagesToAnalyze.length) * 20)); // 15-35 arası
+  }
+
+  console.log("OSD Analiz Sonuclari:", analysisResults);
+
+  // Patern bulma (Çok basit bir kural motoru)
+  // Kural 1: Hepsi ayni acida mi?
+  let allSame = true;
+  let firstAngle = analysisResults[0].angle;
+  for (let res of analysisResults) {
+    if (res.angle !== firstAngle) {
+      allSame = false;
+      break;
+    }
+  }
+
+  // Kural 2: Alternatifli mi? (Tekler X, Çiftler Y)
+  let alternating = true;
+  let oddAngle = -1;
+  let evenAngle = -1;
+  
+  for (let res of analysisResults) {
+    if (res.pageNum % 2 !== 0) {
+      if (oddAngle === -1) oddAngle = res.angle;
+      else if (oddAngle !== res.angle) alternating = false;
+    } else {
+      if (evenAngle === -1) evenAngle = res.angle;
+      else if (evenAngle !== res.angle) alternating = false;
+    }
+  }
+
+  let patternFound = false;
+  let applyAllAngle = 0;
+  let applyOddAngle = 0;
+  let applyEvenAngle = 0;
+
+  if (allSame && firstAngle !== 0) {
+    patternFound = true;
+    applyAllAngle = firstAngle;
+  } else if (alternating && (oddAngle !== 0 || evenAngle !== 0)) {
+    patternFound = true;
+    applyOddAngle = oddAngle;
+    applyEvenAngle = evenAngle;
+  }
+
+  let usePattern = false;
+  
+  if (patternFound) {
+    let msg = "";
+    if (allSame) {
+      msg = \`Patern Bulundu: Kitaptaki tum sayfalar \${firstAngle} derece yatmis gorunuyor. Tum sayfalara uygulanip aninda duzeltilsin mi?\`;
+    } else {
+      msg = \`Patern Bulundu: Tek sayfalar \${oddAngle} derece, Cift sayfalar \${evenAngle} derece yatmis gorunuyor. Aninda duzeltilsin mi?\`;
+    }
+    
+    usePattern = window.confirm(msg);
+  }
+
+  // PDF-lib'i yukle
+  onProgress(40);
+  const pdfDoc = await PDFLib.PDFDocument.load(bytes);
+  const pages = pdfDoc.getPages();
+
+  if (usePattern) {
+    // Hızlı Mod: Sadece paterne göre tüm sayfaları çevir (PDF-lib ile)
+    onProgress(60);
+    for (let i = 0; i < pages.length; i++) {
+      const pageNum = i + 1;
+      let angleToFix = 0;
+      
+      if (allSame) {
+        angleToFix = applyAllAngle;
+      } else {
+        angleToFix = (pageNum % 2 !== 0) ? applyOddAngle : applyEvenAngle;
+      }
+      
+      if (angleToFix !== 0) {
+        // Tesseract'ın verdiği açı saat yönünün tersi (CCW) veya rotasyon ihtiyacı olabilir.
+        // Genelde Tesseract "bu kadar dönmüş" der. Yani düzeltmek için tersini uygulamalıyız.
+        // PDFLib sayfa rotasyonu saat yönündedir.
+        const currentRotation = pages[i].getRotation().angle;
+        pages[i].setRotation(PDFLib.degrees(currentRotation + (360 - angleToFix)));
+      }
+      onProgress(60 + Math.round((i / pages.length) * 30)); // 60-90 arası
+    }
+  } else {
+    // Yavaş Mod / Fallback: Hiçbir patern bulunamadı, veya kullanıcı iptal etti.
+    // Analiz edilenleri uygula, edilmeyenleri OCR et.
+    const isBig = totalPages > 50;
+    if (isBig) {
+      const slowConfirm = window.confirm("Patern bulunamadi. Bu islem yavas modda devam edecek ve tum sayfalar analiz edilecek. Devam edilsin mi? (Iptal derseniz islem iptal olur)");
+      if (!slowConfirm) throw new Error("Islem kullanici tarafindan iptal edildi.");
+    }
+
+    onProgress(45);
+    
+    // Halihazirda analiz ettiklerimizi hizlica map'e alalim
+    const analyzedMap = {};
+    for (let res of analysisResults) {
+      analyzedMap[res.pageNum] = res.angle;
+    }
+
+    for (let i = 0; i < pages.length; i++) {
+      const pageNum = i + 1;
+      let angleToFix = 0;
+      
+      if (analyzedMap[pageNum] !== undefined) {
+        angleToFix = analyzedMap[pageNum];
+      } else {
+        const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum);
+        const { data } = await worker.recognize(dataUrl, { osd: true });
+        angleToFix = data.orientation_degrees || 0;
+      }
+      
+      if (angleToFix !== 0) {
+        const currentRotation = pages[i].getRotation().angle;
+        pages[i].setRotation(PDFLib.degrees(currentRotation + (360 - angleToFix)));
+      }
+      
+      onProgress(45 + Math.round((i / pages.length) * 45)); // 45-90 arası
+    }
+  }
+
+  onProgress(95);
+  const pdfBytesOut = await pdfDoc.save();
+  onProgress(100);
+
+  return {
+    blob: new Blob([pdfBytesOut], { type: "application/pdf" }),
+    fileName: \`\${baseName}_duzeltilmis.pdf\`
+  };
 }
