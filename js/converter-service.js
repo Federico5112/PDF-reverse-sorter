@@ -891,10 +891,10 @@ async function pdfSmartRotate(file, baseName, onProgress) {
   // Örnekleri analiz et
   for (let i = 0; i < pagesToAnalyze.length; i++) {
     const pageNum = pagesToAnalyze[i];
-    const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum);
+    const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum, 1.5);
     
-    // Tesseract OSD tespiti
-    const { data } = await worker.recognize(dataUrl, { osd: true });
+    // Tesseract OSD tespiti (worker.detect kullanilmalidir)
+    const { data } = await worker.detect(dataUrl);
     
     // orientation_degrees genelde 0, 90, 180, 270 döner
     let angle = data.orientation_degrees || 0;
@@ -1009,8 +1009,8 @@ async function pdfSmartRotate(file, baseName, onProgress) {
       if (analyzedMap[pageNum] !== undefined) {
         angleToFix = analyzedMap[pageNum];
       } else {
-        const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum);
-        const { data } = await worker.recognize(dataUrl, { osd: true });
+        const dataUrl = await renderPdfPageToDataUrl(pdf, pageNum, 1.5);
+        const { data } = await worker.detect(dataUrl);
         angleToFix = data.orientation_degrees || 0;
       }
       
