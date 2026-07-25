@@ -41,6 +41,7 @@ const dom = {
   resultDetail: $("#result-detail"),
   downloadLink: $("#download-link"),
   downloadText: $("#download-text"),
+  extraDownloads: $("#extra-downloads"),
   newFileBtn: $("#new-file-btn"),
   retryBtn: $("#retry-btn"),
   errorDetail: $("#error-detail"),
@@ -194,6 +195,23 @@ async function startConversion(tool) {
     dom.downloadText.textContent = `${result.fileName} indir`;
     dom.resultDetail.textContent =
       `${tool.label} islemi tamamlandi. Dosya boyutu: ${formatFileSize(result.blob.size)}`;
+
+    if (result.extraDownloads && result.extraDownloads.length > 0) {
+      dom.extraDownloads.innerHTML = "";
+      dom.extraDownloads.classList.remove("is-hidden");
+      result.extraDownloads.forEach(ed => {
+        const url = URL.createObjectURL(ed.blob);
+        const a = document.createElement("a");
+        a.className = "btn btn-outline download-extra-btn";
+        a.href = url;
+        a.download = ed.fileName;
+        a.innerHTML = `<span style="margin-right:8px">${ed.emoji || "📄"}</span> ${ed.label}`;
+        dom.extraDownloads.appendChild(a);
+      });
+    } else {
+      dom.extraDownloads.innerHTML = "";
+      dom.extraDownloads.classList.add("is-hidden");
+    }
 
     showScreen("result");
   } catch (error) {

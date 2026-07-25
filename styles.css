@@ -574,6 +574,25 @@ input {
   transform: translateY(0);
 }
 
+.btn-outline {
+  color: var(--text);
+  background: var(--surface-hover);
+  border: 1px solid var(--border);
+}
+
+.btn-outline:hover {
+  background: var(--surface-active);
+  border-color: var(--border-hover);
+}
+
+.extra-downloads {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
 .btn-ghost {
   color: var(--text-secondary);
   background: transparent;

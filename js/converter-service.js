@@ -40,6 +40,8 @@ export function getAvailableTools(ext) {
     case "pdf":
       tools.push(
         { id: "pdf-reverse", label: "Sayfalari Ters Cevir", emoji: "🔄", targetExt: "pdf" },
+        { id: "pdf-extract-odd", label: "Sadece Tek Sayfalar", emoji: "📄", targetExt: "pdf" },
+        { id: "pdf-extract-even", label: "Sadece Cift Sayfalar", emoji: "📄", targetExt: "pdf" },
         { id: "pdf-to-jpg", label: "PDF → JPG", emoji: "🖼️", targetExt: "jpg" },
         { id: "pdf-to-png", label: "PDF → PNG", emoji: "🖼️", targetExt: "png" },
         { id: "pdf-smart-rotate", label: "Akilli Yonlendirici", emoji: "🪄", targetExt: "pdf" }
@@ -150,6 +152,10 @@ export async function convert(file, toolId, onProgress = () => {}) {
     // ---- PDF İşlemleri ----
     case "pdf-reverse":
       return await pdfReverse(file, baseName, onProgress);
+    case "pdf-extract-odd":
+      return await pdfExtractPages(file, baseName, "odd", onProgress);
+    case "pdf-extract-even":
+      return await pdfExtractPages(file, baseName, "even", onProgress);
     case "pdf-to-jpg":
       return await pdfToImages(file, baseName, "jpg", onProgress);
     case "pdf-to-png":
@@ -200,9 +206,9 @@ export async function convert(file, toolId, onProgress = () => {}) {
 // ============================================================
 
 async function pdfReverse(file, baseName, onProgress) {
-  onProgress(10);
+  onProgress(5);
   const bytes = await file.arrayBuffer();
-  onProgress(30);
+  onProgress(15);
 
   let source;
   try {
@@ -219,20 +225,100 @@ async function pdfReverse(file, baseName, onProgress) {
     throw new Error("Bu PDF sadece 1 sayfadan olusuyor. Ters cevirilecek bir sayfa sirasi yok.");
   }
 
+  // 1. Ana dosya (Ters)
   const target = await PDFLib.PDFDocument.create();
   const pageIndexes = source.getPageIndices().reverse();
-  onProgress(50);
-
+  onProgress(30);
+  
   const copiedPages = await target.copyPages(source, pageIndexes);
   copiedPages.forEach((page) => target.addPage(page));
+  onProgress(50);
+  const outputBytes = await target.save();
+
+  // 2. Ekstra indirmeler: Ters cevrilmis dosyanin tek ve cift sayfalari
+  // "Ters" hali uzerinden islem yapacagimiz icin, target dokumanini kullanamayiz cunku kopyalama bitti
+  // Ancak pageIndexes icindeki elemanlari odd/even indexlerine gore (0-based) siralayabiliriz.
+  // 0. index (Sayfa 1 - Tek), 1. index (Sayfa 2 - Cift)
+  const oddIndexes = pageIndexes.filter((_, i) => i % 2 === 0);
+  const evenIndexes = pageIndexes.filter((_, i) => i % 2 !== 0);
+
+  onProgress(60);
+  
+  let extraDownloads = [];
+  
+  // Ters (Tek Sayfalar)
+  if (oddIndexes.length > 0) {
+    const oddTarget = await PDFLib.PDFDocument.create();
+    const oddCopied = await oddTarget.copyPages(source, oddIndexes);
+    oddCopied.forEach(p => oddTarget.addPage(p));
+    const oddBytes = await oddTarget.save();
+    extraDownloads.push({
+      blob: new Blob([oddBytes], { type: "application/pdf" }),
+      fileName: `${baseName}_ters_tek_sayfalar.pdf`,
+      label: "Sadece Tek Sayfalar",
+      emoji: "📄"
+    });
+  }
   onProgress(80);
 
-  const outputBytes = await target.save();
+  // Ters (Cift Sayfalar)
+  if (evenIndexes.length > 0) {
+    const evenTarget = await PDFLib.PDFDocument.create();
+    const evenCopied = await evenTarget.copyPages(source, evenIndexes);
+    evenCopied.forEach(p => evenTarget.addPage(p));
+    const evenBytes = await evenTarget.save();
+    extraDownloads.push({
+      blob: new Blob([evenBytes], { type: "application/pdf" }),
+      fileName: `${baseName}_ters_cift_sayfalar.pdf`,
+      label: "Sadece Cift Sayfalar",
+      emoji: "📄"
+    });
+  }
+  
   onProgress(100);
 
   return {
     blob: new Blob([outputBytes], { type: "application/pdf" }),
     fileName: `${baseName}_ters.pdf`,
+    extraDownloads,
+  };
+}
+
+async function pdfExtractPages(file, baseName, type, onProgress) {
+  onProgress(10);
+  const bytes = await file.arrayBuffer();
+  onProgress(30);
+
+  let source;
+  try {
+    source = await PDFLib.PDFDocument.load(bytes);
+  } catch (err) {
+    throw new Error("PDF okunamadi.");
+  }
+
+  const pageCount = source.getPageCount();
+  const allIndexes = source.getPageIndices();
+  
+  // type === "odd" ise 0, 2, 4... (sayfa 1, 3, 5)
+  // type === "even" ise 1, 3, 5... (sayfa 2, 4, 6)
+  const targetIndexes = allIndexes.filter(i => type === "odd" ? (i % 2 === 0) : (i % 2 !== 0));
+
+  if (targetIndexes.length === 0) {
+    throw new Error(`Bu dokumanda cikarilacak ${type === "odd" ? "tek" : "cift"} sayfa bulunamadi.`);
+  }
+
+  const target = await PDFLib.PDFDocument.create();
+  const copiedPages = await target.copyPages(source, targetIndexes);
+  copiedPages.forEach(p => target.addPage(p));
+  onProgress(80);
+
+  const outputBytes = await target.save();
+  onProgress(100);
+
+  const suffix = type === "odd" ? "tek_sayfalar" : "cift_sayfalar";
+  return {
+    blob: new Blob([outputBytes], { type: "application/pdf" }),
+    fileName: `${baseName}_${suffix}.pdf`,
   };
 }
 
