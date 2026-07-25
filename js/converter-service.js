@@ -40,8 +40,8 @@ export function getAvailableTools(ext) {
     case "pdf":
       tools.push(
         { id: "pdf-reverse", label: "Sayfalari Ters Cevir", emoji: "🔄", targetExt: "pdf" },
-        { id: "pdf-extract-odd", label: "Sadece Tek Sayfalar", emoji: "📄", targetExt: "pdf" },
-        { id: "pdf-extract-even", label: "Sadece Cift Sayfalar", emoji: "📄", targetExt: "pdf" },
+        { id: "pdf-extract-odd", label: "Sadece Tek Sayfalar", emoji: "1️⃣", targetExt: "pdf" },
+        { id: "pdf-extract-even", label: "Sadece Cift Sayfalar", emoji: "2️⃣", targetExt: "pdf" },
         { id: "pdf-to-jpg", label: "PDF → JPG", emoji: "🖼️", targetExt: "jpg" },
         { id: "pdf-to-png", label: "PDF → PNG", emoji: "🖼️", targetExt: "png" },
         { id: "pdf-smart-rotate", label: "Akilli Yonlendirici", emoji: "🪄", targetExt: "pdf" }
@@ -256,7 +256,7 @@ async function pdfReverse(file, baseName, onProgress) {
       blob: new Blob([oddBytes], { type: "application/pdf" }),
       fileName: `${baseName}_ters_tek_sayfalar.pdf`,
       label: "Sadece Tek Sayfalar",
-      emoji: "📄"
+      emoji: "1️⃣"
     });
   }
   onProgress(80);
@@ -271,7 +271,7 @@ async function pdfReverse(file, baseName, onProgress) {
       blob: new Blob([evenBytes], { type: "application/pdf" }),
       fileName: `${baseName}_ters_cift_sayfalar.pdf`,
       label: "Sadece Cift Sayfalar",
-      emoji: "📄"
+      emoji: "2️⃣"
     });
   }
   
